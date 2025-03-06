@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Level Monitor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .pagination .page-link {
+            color: #007bff;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
+        .table-responsive {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .table {
+            background-color: #fff;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4"><i class="fas fa-water"></i> Water Level Monitor</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="station"><i class="fas fa-map-marker-alt"></i> Select Station:</label>
+                <select name="station" id="station" class="form-control">
+                    <option value="">Select a Station</option>
+                    {% for notation, label in stations.items() %}
+                        <option value="{{ notation }}" {% if notation == selected_station %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Submit</button>
+        </form>
+
+        {% if error_message %}
+            <div class="alert alert-danger mt-3" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> {{ error_message }}
+            </div>
+        {% endif %}
+
+        {% if plot_div %}
+            <div class="mt-4">
+                <h2><i class="fas fa-chart-line"></i> Water Level Graph</h2>
+                {{ plot_div | safe }}
+            </div>
+        {% endif %}
+
+        {% if table_html %}
+            <h2 class="mt-4"><i class="fas fa-table"></i> Readings</h2>
+            <div class="table-responsive">
+                {{ table_html | safe }}
+            </div>
+        {% endif %}
+
+        {% if pagination %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('index', page=pagination.prev_page, selected_station=pagination.selected_station) }}" tabindex="-1"><i class="fas fa-chevron-left"></i> Previous</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ pagination.page }}</a>
+                    </li>
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('index', page=pagination.next_page, selected_station=pagination.selected_station) }}"><i class="fas fa-chevron-right"></i> Next</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
